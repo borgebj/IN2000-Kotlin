@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Oblig 1</string>
+    <string name="g_videre">Gå videre</string>
+    <string name="skriv_inn_ord_her">Skriv inn ord her</string>
+    <string name="palindrom_sjekker">Palindrom-sjekker</string>
+    <string name="sjekk">Sjekk</string>
+    <string name="konverterer">Konverterer</string>
+    <string name="konverter">Konverter</string>
+    <string name="hvor_mye_skal_konverteres">Hvor mye skal konverteres</string>
+    <string name="restart_quiz">restart quiz</string>
+    <string name="test" />
+    <string name="quiz">Quiz</string>
+    <string name="riktig">Riktig</string>
+    <string name="galt">Galt</string>
+
+    <string-array name="enheter">
+        <item>Fluid ounce (fl oz)</item>
+        <item>Cup (cp)</item>
+        <item>Gallon (gal)</item>
+        <item>Hogshead</item>
+    </string-array>
+</resources>
