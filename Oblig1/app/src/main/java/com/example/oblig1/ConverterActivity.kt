@@ -36,7 +36,7 @@ class ConverterActivity : AppCompatActivity(), AdapterView.OnItemSelectedListene
         textView = findViewById(R.id.textView2)
 
         ArrayAdapter.createFromResource(this, R.array.enheter, android.R.layout.simple_spinner_item)
-            .also { adapter ->
+            .also {     adapter ->
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 spinner.adapter = adapter
             }
