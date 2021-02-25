@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import de.hdodenhof.circleimageview.CircleImageView
 
 class PartyAdapter(private val liste: MutableList<AlpacaParty>) :
@@ -53,6 +52,14 @@ class PartyAdapter(private val liste: MutableList<AlpacaParty>) :
             .fitCenter()
             .into(viewHolder.circle)
         viewHolder.textTo.text = "Leader: ${liste[position].leader}"
+        val votes: String = liste[position].votes
+        val total: String = liste[position].total
+
+        // sjekker om variablene ikke er 'null' etter formatering - finner prosent og viser
+        if ("$votes" != "null" && "$total" != "null") {
+            val tall: String = String.format("%.2f", (votes.toDouble()*100)/total.toDouble())
+            viewHolder.textTre.text = "Votes: $votes - $tall%"
+        } else viewHolder.textTre.text = ""
     }
 
     // Return the size of your dataset (invoked by the layout manager)

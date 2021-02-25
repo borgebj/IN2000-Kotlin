@@ -3,6 +3,7 @@
     <string name="disstrikter">Distrikter</string>
 
     <string-array name="distrikter">
+        <item></item>
         <item> Distrikt 1</item>
         <item> Distrikt 2</item>
         <item> Distrikt 3</item>

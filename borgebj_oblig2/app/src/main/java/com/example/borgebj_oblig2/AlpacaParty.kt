@@ -7,7 +7,9 @@ data class AlpacaParty(
     @SerializedName("name") val name: String,
     @SerializedName("leader") val leader: String,
     @SerializedName("img") val img: String,
-    @SerializedName("color") val color: String) {}
+    @SerializedName("color") val color: String,
+    var votes: String = "",
+    var total: String = "") {}
 
 data class AlpacaListe(@SerializedName("parties") val parties: List<AlpacaParty>)
 
