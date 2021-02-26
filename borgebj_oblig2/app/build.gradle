@@ -37,6 +37,12 @@ android {
     }
 }
 
+// for Glide
+repositories {
+    google()
+    jcenter()
+}
+
 dependencies {
 
     // GSON, coroutine og KHTTP

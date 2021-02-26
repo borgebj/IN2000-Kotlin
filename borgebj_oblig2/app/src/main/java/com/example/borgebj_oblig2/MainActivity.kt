@@ -94,8 +94,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         //Hjelpemetode som venter og oppdaterer progressbaren
         suspend fun vent() {
             while (progressBar.progress < 100) {
-                progressBar.progress += (15..25).random()
-                delay(100)
+                progressBar.progress += (15..35).random()
+                delay(90)
             }
         }
 

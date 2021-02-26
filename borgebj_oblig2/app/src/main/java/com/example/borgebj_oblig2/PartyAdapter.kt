@@ -9,26 +9,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import de.hdodenhof.circleimageview.CircleImageView
 
+
 class PartyAdapter(private val liste: MutableList<AlpacaParty>) :
     RecyclerView.Adapter<PartyAdapter.ViewHolder>() {
 
-
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val viewt: View
-        val textEn: TextView
-        val circle: CircleImageView
-        val textTo: TextView
-        var textTre: TextView
-
-
-        init {
-            // Define click listener for the ViewHolder's View.
-            viewt = view.findViewById(R.id.view)
-            circle = view.findViewById(R.id.circle)
-            textEn = view.findViewById(R.id.textEn)
-            textTo = view.findViewById(R.id.textTo)
-            textTre = view.findViewById(R.id.textTre)
-        }
+        val viewt: View = view.findViewById(R.id.view)
+        val textEn: TextView = view.findViewById(R.id.textEn)
+        val circle: CircleImageView = view.findViewById(R.id.circle)
+        val textTo: TextView = view.findViewById(R.id.textTo)
+        var textTre: TextView = view.findViewById(R.id.textTre)
     }
 
 
@@ -48,7 +38,6 @@ class PartyAdapter(private val liste: MutableList<AlpacaParty>) :
 
         Glide.with(viewHolder.itemView.context)
             .load(liste[position].img)
-            .placeholder(R.mipmap.ic_launcher_round)
             .fitCenter()
             .into(viewHolder.circle)
         viewHolder.textTo.text = "Leader: ${liste[position].leader}"
@@ -57,7 +46,7 @@ class PartyAdapter(private val liste: MutableList<AlpacaParty>) :
 
         // sjekker om variablene ikke er 'null' etter formatering - finner prosent og viser
         if ("$votes" != "null" && "$total" != "null") {
-            val tall: String = String.format("%.2f", (votes.toDouble()*100)/total.toDouble())
+            val tall: String = String.format("%.2f", (votes.toDouble() * 100) / total.toDouble())
             viewHolder.textTre.text = "Votes: $votes - $tall%"
         } else viewHolder.textTre.text = ""
     }
