@@ -1,11 +1,10 @@
 <resources>
     <string name="app_name">borgebj_oblig2</string>
-    <string name="disstrikter">Distrikter</string>
-
     <string-array name="distrikter">
         <item></item>
-        <item> Distrikt 1</item>
-        <item> Distrikt 2</item>
-        <item> Distrikt 3</item>
+        <item>Distrikt 1</item>
+        <item>Distrikt 2</item>
+        <item>Distrikt 3</item>
+        <item>Vis alle distrikter</item>
     </string-array>
 </resources>

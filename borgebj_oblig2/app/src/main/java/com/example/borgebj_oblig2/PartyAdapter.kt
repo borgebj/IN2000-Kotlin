@@ -41,11 +41,11 @@ class PartyAdapter(private val liste: MutableList<AlpacaParty>) :
             .fitCenter()
             .into(viewHolder.circle)
         viewHolder.textTo.text = "Leader: ${liste[position].leader}"
-        val votes: String = liste[position].votes
-        val total: String = liste[position].total
+        val votes: Int = liste[position].votes
+        val total: Int = liste[position].total
 
         // sjekker om variablene ikke er 'null' etter formatering - finner prosent og viser
-        if ("$votes" != "null" && "$total" != "null") {
+        if (votes != 0 && total != 0) {
             val tall: String = String.format("%.2f", (votes.toDouble() * 100) / total.toDouble())
             viewHolder.textTre.text = "Votes: $votes - $tall%"
         } else viewHolder.textTre.text = ""

@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import kotlinx.coroutines.*
-import java.io.InputStream
 import java.util.*
 
 
@@ -41,7 +40,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         recycler = findViewById(R.id.recycler)
         spinner = findViewById(R.id.spinner)
         progressBar = findViewById(R.id.progressBar)
-        progressBar = findViewById(R.id.progressBar)
+        recycler.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
     }
 
     fun addAdapter() {
@@ -69,10 +68,9 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     // metode som parser fra start-data fra JSON
     fun parse() {
-        val parties = "/studier/emner/matnat/ifi/IN2000/v21/obligatoriske-oppgaver/alpakkaland/alpacaparties.json"
         //region (coroutine-1) starter en coroutine for aa parse
         CoroutineScope(Dispatchers.IO).launch {
-            val response = getData(parties)
+            val response = getData("/studier/emner/matnat/ifi/IN2000/v21/obligatoriske-oppgaver/alpakkaland/alpacaparties.json")
 
             val json: AlpacaListe = gson.fromJson(response, AlpacaListe::class.java)
             val lister: List<AlpacaParty> = json.parties.toList()
@@ -91,68 +89,86 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         progressBar.progress = 0
         progressBar.visibility = View.VISIBLE
 
-        //Hjelpemetode som venter og oppdaterer progressbaren
+        // nullstiller stemmene til alle partier
+        fun resetPartier() {
+            for (parti in partier) {
+                parti.votes = 0
+                parti.total = 0
+            }
+        }
+
+        //region [Ekstafunksjonalitet] Hjelpemetode som venter og oppdaterer progressbaren
         suspend fun vent() {
             while (progressBar.progress < 100) {
                 progressBar.progress += (15..35).random()
                 delay(90)
             }
-        }
+        }//endregion
 
         //Hjelpemetode som teller stemmer for hver distrikt
         fun tellStemmer(distrikt: String) {
-            val liste: List<IDholder>? = gson.fromJson(distrikt, Array<IDholder>::class.java).toList()
+            val liste: List<IDholder> = gson.fromJson(distrikt, Array<IDholder>::class.java).toList()
+            resetPartier()
 
-            val parti1: Int = 0
-            val parti2: Int = 0
-            val parti3: Int = 0
-            val parti4: Int = 0
-            val total = liste?.size
-            val p: MutableList<Int> = mutableListOf(parti1, parti2, parti3, parti4)
-
-            // sjekker ID'er og teller stemmer
-            if (liste != null) {
-                for (nyId in liste) {
-                    for (parti in partier) {
-                        if (nyId.id == parti.id) {
-                            when (nyId.id) {
-                                "1" -> p[0]++
-                                "2" -> p[1]++
-                                "3" -> p[2]++
-                                "4" -> p[3]++
-                            }
+            // tildeler stemmer og totalt antall til hvert parti
+            for (i in liste.indices) {
+                for (j in partier.indices) {
+                    partier[j].total = liste.size
+                    if (liste[i].id == partier[j].id) {
+                        when (liste[i].id) {
+                            "1" -> partier[0].votes++
+                            "2" -> partier[1].votes++
+                            "3" -> partier[2].votes++
+                            "4" -> partier[3].votes++
                         }
                     }
                 }
             }
-            // tildeler stemmer og totalt antall til hvert parti
-            for (i in partier.indices) {
-                partier[i].votes = p[i].toString()
-                partier[i].total = total.toString()
-            }
         }
 
         // metode som utforer oppgaven for valg av distrikt tre. parsing -> tildeling
-        suspend fun distriktTre() {
-            val tre = getData("/studier/emner/matnat/ifi/IN2000/v21/obligatoriske-oppgaver/alpakkaland/district3.xml")
-            val inputStream: InputStream = tre.byteInputStream()
+        fun distriktTre(tre: String) {
+            resetPartier()
             val parser = XmlParser()
-            val d3 = parser.parse(inputStream)
-            vent()
+            val d3 = parser.parse(tre.byteInputStream())
             for (i in d3.indices) {
                 if (d3[i].id == partier[i].id) {
-                    partier[i].votes = d3[i].votes.toString()
-                    partier[i].total = parser.totalVotes.toString()
+                    partier[i].votes = d3[i].votes!!
+                    partier[i].total = parser.totalVotes
                 }
             }
         }
+
+        //region [Ekstafunksjonalitet] metoder som henter stemmer fra alle distrikter og viser de
+        fun hentAlle(en: String, to: String, tre: String) {
+
+            resetPartier()
+            // JSON-distrikter
+            val listeEn: List<IDholder> = gson.fromJson(en, Array<IDholder>::class.java).toList()
+            val listeTo: List<IDholder> = gson.fromJson(to, Array<IDholder>::class.java).toList()
+
+            // XML-distriktet
+            val parser = XmlParser()
+            val listeTre: List<districtThree> = parser.parse(tre.byteInputStream())
+
+            val total = (listeEn.size + listeTo.size + parser.totalVotes)
+            for (parti in partier) {
+                parti.total = total
+                fun tellStemmer(liste: List<IDholder>) {
+                    for (x in liste) { if (parti.id == x.id) parti.votes++ }
+                }
+                // teller stemmer for hvert distrikt via hjelpemetode ↑
+                tellStemmer(listeEn)
+                tellStemmer(listeTo)
+                for (c in listeTre) { if (c.id == parti.id) parti.votes += c.votes!! }
+            }
+        }//endregion
 
         //region - (coroutine-2)
         CoroutineScope(Dispatchers.IO).launch {
 
             // valg av spinner-item
-            val verdi: String = parent?.getItemAtPosition(position).toString()
-            when (verdi) {
+            when (parent?.getItemAtPosition(position).toString()) {
                 "Distrikt 1" -> {
                     vent()
                     val en = getData("/studier/emner/matnat/ifi/IN2000/v21/obligatoriske-oppgaver/alpakkaland/district1.json")
@@ -164,7 +180,16 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     tellStemmer(to)
                 }
                 "Distrikt 3" -> {
-                    distriktTre()
+                    vent()
+                    val tre = getData("/studier/emner/matnat/ifi/IN2000/v21/obligatoriske-oppgaver/alpakkaland/district3.xml")
+                    distriktTre(tre)
+                }
+                "Vis alle distrikter" -> {
+                    vent()
+                    val en = getData("/studier/emner/matnat/ifi/IN2000/v21/obligatoriske-oppgaver/alpakkaland/district1.json")
+                    val to = getData("/studier/emner/matnat/ifi/IN2000/v21/obligatoriske-oppgaver/alpakkaland/district2.json")
+                    val tre = getData("/studier/emner/matnat/ifi/IN2000/v21/obligatoriske-oppgaver/alpakkaland/district3.xml")
+                    hentAlle(en, to ,tre)
                 }
             }
             // oppdaterer cardview og gjemmer progressbar
